@@ -162,7 +162,7 @@ loop {
 } 
 
 
-pub fn int_sqrt(n :u64) -> usize {
+pub fn int_sqrt(n :usize) -> usize {
 	((n as f64).sqrt()).floor() as usize
 }  
 
@@ -187,7 +187,7 @@ for i in 1..mu.len() { mu[i] =1 ; }
  			}
  		}
  	}
- 	for j in 2..int_sqrt(ll as u64 <<1) {
+ 	for j in 2..int_sqrt(ll<<1) {
  		if mu[j] == 1- 2*j as i32{
  			for i in ((2*j*j -2*j +1)..ll+2).step_by( 4*j*j -4*j +1 ) {
  			mu[i] = 0 ;	
@@ -224,7 +224,7 @@ pub fn s1b_subst(b : u32, p : &[u32], n : u32, mu : &[i32], m : u64, count : &mu
 //begin
 let pp = p[b as usize + 1]    ;
 let mut j = maxm((n / pp)as i32, pp as i32) as usize +1 ;
-j -= j % 2 - 1 ;
+if j % 2 == 0 { j+=1;} //j -= (j % 2) - 1 ;
 for i in (j..(n+1)as usize).step_by(2) {
 //while i <= n do  begin
 let muval1 = signum(mu[ ( i+1) >>1 ] ) ;
@@ -292,7 +292,7 @@ let    term = (m / (pb as u64 * pb as u64)) as u32;
      let   l = pi[(y as usize + 1) >> 1] as usize - b + 1;
       let  term2 = m / (p[b + 1] as u64 * p[b + l] as u64);
       let  dprime = pi[(term2 as usize + 1) >> 1];
-          if p[dprime as usize + 1] <= int_sqrt(m / p[b + 1] as u64) as u32 || dprime <= b as u32 {
+          if p[dprime as usize + 1] <= int_sqrt((m / p[b + 1] as u64) as usize) as u32 || dprime <= b as u32 {
       tt[b] = 1;
       *count += l as i64;
     d2[b]-=1 ;

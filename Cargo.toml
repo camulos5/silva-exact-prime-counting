@@ -4,8 +4,11 @@ name = "silva"
 version = "0.0.1"
 authors = [ "Your name <you@example.com>" ]
 
+[profile.release]
+opt-level = 3
+
 [[bin]]
 
 name = "silva"
 
-[dependencies]
+

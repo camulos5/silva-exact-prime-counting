@@ -2,7 +2,7 @@ extern crate silva ;
 use silva::* ;
 
 fn main() {
-	let exponent = 6 ;
+	let exponent = 16 ;
 	 let m = 10.0_f64.powi(exponent) as u64 ;
 	 println!("{}",m) ;
   let mut beta = 0.00087 ;
@@ -26,7 +26,7 @@ let mut pi : Box<[u32]> = vec![0;ll as usize + 3].into_boxed_slice() ; //Vec<u32
   //init_mu(ll);
   let mut pix = 0 ;
   init_arrays(ll as usize,&mut mu,&mut pix,&mut pi, &mut p) ;
-println!("{:?}",p) ;  //for i in p do write(i,' ') ;
+//println!("{:?}",p) ;  //for i in p do write(i,' ') ;
   //writeln();
   //for j in mu do write(j,' ') ;
   //writeln() ;
@@ -43,7 +43,7 @@ let  num_intervals : u16 = (z / interval_length) as u16 + 1 ;
   println!("# of intervals = {} ",num_intervals);
 let mut interval_boundaries : Box<[u32]> = vec![0;num_intervals as usize + 2].into_boxed_slice() ;  //setlength(interval_boundaries , num_intervals+2);
 let mut counter : Box<[i32]> = vec![0;interval_length as usize + 1].into_boxed_slice() ;   //  setlength(counter,interval_length+1) ;
-let mut m1 : Box<[u32]> = vec![0;astar as usize + 1].into_boxed_slice() ;   //  Setlength(m1, astar+1);
+let mut m1 : Box<[u32]> = vec![n;astar as usize + 1].into_boxed_slice() ;   //  Setlength(m1, astar+1);
 let mut phi : Box<[u64]> = vec![0;a as usize + 2].into_boxed_slice() ;   //  Setlength(phi, succ(a)+1);
 let mut t : Box<[u32]> = vec![0;a as usize].into_boxed_slice() ;   //  Setlength(t, a);
 let mut tt : Box<[u8]> = vec![0;a as usize].into_boxed_slice() ;   //  Setlength(tt, a);
@@ -60,24 +60,20 @@ let mut switch : Box<[bool]> = vec![false;a as usize + 2].into_boxed_slice() ;  
   //ord_leaves;
  ord_leaves(n,&mut count,&mu,m);
   // spec_leaves_beqc;
-/*  phi2 := (a * (a - 1)) >> 1;
-  u := isqrt(m);
-  if u mod 2 = 0 then u -= 1;
-  v := a;
-  w := succ(u);
-  for prime := 1  to pred(astar) do m1[prime] := n;
-  for prime := astar to a - 2 do
-  begin
-    //s2b_init(prime);
-    s2b_init(prime,p[prime+1],m,t,n,pi,a,d2,count,tt) ;
-    //s2b_structured(prime,0);
-    s2b_structured(prime,0,s2bprimes,d2,m,p,tt,n,switch,interval_boundaries,count,counter,pi);
-    end;
-    //ProcThreadPool.DoParallel(@s2b1stPass,1,2,nil) ;
-  setlength(t,0);
-  s1b_subst_const := 2;
-//for prime in [0..s1b_subst_const] do  s1b_subst(prime) ;
-for prime in [0..s1b_subst_const] do s1b_subst(prime,p,n,mu,m,count) ;
-end;  {initialize}    
-   */
+let mut  phi2 : u64 = (a as u64* (a as u64 - 1)) >> 1;
+let mut  u = 10.0_f64.powf(exponent as f64 / 2.0).floor() as u32; //int_sqrt(m as usize);
+  if u % 2 == 0 { u -= 1;}
+  println!("u = {} ",u);
+  let mut v = a;
+  let mut w = u + 1;
+  let mut s2bprimes = 0 ;
+//  for prime in 1..astar { m1[prime as usize] = n; }
+ for prime in astar..(a - 1) {
+    s2b_init(prime,p[prime as usize+1],m,&mut t,n,&pi,a,&mut d2,&mut count,&mut tt) ;
+    s2b_structured(prime as usize,0,&mut s2bprimes,&mut d2,m,&p,&mut tt,n,&mut switch,&interval_boundaries,&mut count,&counter,&pi);
+  }
+//  setlength(t,0);
+let  s1b_subst_const = 2;
+for prime in 0..s1b_subst_const+1 { s1b_subst(prime,&p,n,&mu,m,&mut count) ; }
+println!("count at start of main loop = {} ",count) ;
 }
