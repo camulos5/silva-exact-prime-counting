@@ -3,15 +3,16 @@
 
 extern crate alloc_jemalloc;
 
+const SIGNBIT : i32 = 1<<31;
 
 pub fn cnt_query(mut pos : usize, counter : &[i32]) -> u32 {
-let mut  result=counter[pos]; // as isize;
+let mut  result=counter[pos] & !SIGNBIT ; // as isize;
 pos+=1 ;
 pos &= pos -1 ;
 while pos > 1 {
-result+=counter[pos - 1] ;
+result+=counter[pos - 1] & !SIGNBIT ;
 pos &= pos - 1 ; }
-(result & !(1<<31)) as u32
+(result & !SIGNBIT) as u32
 }
 
 
@@ -25,8 +26,8 @@ pub fn cnt_update(mut pos : usize, counter : &mut[i32], interval_length : usize 
 
 
 pub fn cnt_init(counter: &mut[i32], interval_length : usize) {
-for i in 0..interval_length as i32{
-      counter[i as usize] = (i+1)  & !i  ;
+for i in 0..interval_length {
+      counter[i] = ((i as i32 +1)  & !(i as i32)) as i32 ;
       }
 }
 
@@ -49,19 +50,19 @@ pub extern "system" fn intervalclear( b : usize , offset : &mut[u32], counter : 
    }
 
 
- pub fn rphi(n: i64,  mut a : u32, bit : i8 , pp: &[u32],  total : &mut i64 )  {
+ pub fn rphi(n: i64,  mut a : usize, bit : i8 , pp: &[u32],  total : &mut i64 )  {
 	loop {
 		if a==1 {
 			*total +=  bit as i64 * n ; 
 			  break;
 			}
-			else if n < pp[a as usize] as i64{
+			else if n < pp[a] as i64{
 			*total += bit as i64 ;
 				break;
 				}
 			else {
 				a-=1;
-				rphi(n / (pp[a as usize] as i64), a, -bit, pp, total) ;
+				rphi(n / (pp[a] as i64), a, -bit, pp, total) ;
 					}
 				}
 		}
@@ -100,12 +101,12 @@ pub extern "system" fn intervalclear( b : usize , offset : &mut[u32], counter : 
 */
  
  
- pub fn s1b( b : usize , interval : usize ,  m1 : &mut[u32] , n : u32, pp : u32 , m : u64 ,
+ pub fn s1b( b : usize , interval : usize ,  m1 : &mut [u32] , n : u32, pp : u32 , m : u64 ,
  	 interval_boundaries : &[u32], mu : &[i32], count : &mut i64, phi : &[u64], counter : &[i32]) { 
-    m1[b] += m1[b] % 2 - 1;
-  let criterion : u32 = n / pp ;
+    if m1[b] % 2 ==0 { m1[b]-=1;} //m1[b] += m1[b] % 2 - 1;
+  let criterion : u32 = n / pp ; //print!("m1[b] = {}, criterion = {}, interval_boundaries[interval] = {} ",m1[b], criterion, interval_boundaries[interval]) ;
       while m1[b] > criterion {
-   let    y : u32 = (m / (m1[b] as u64* pp as u64 )) as u32  ;
+   let    y : u32 = (m / (m1[b] as u64 * pp as u64 )) as u32  ; //print!("y = {} ",y) ;
     if y > interval_boundaries[interval + 1] - 2 { return ;} 
  let   muvalue : i32 = mu[((m1[b]+1) >> 1) as usize]; 
     if nabs(muvalue) as u32 > pp {
@@ -138,8 +139,8 @@ for b in 0..blockc.len() { blockc[b] = false ; }
 }
  // block doesn't need to be global 
  
- pub fn p2(interval : usize, p2primes :  &mut u32, u : &mut u32, v :  &mut u32, n : u32, w : &mut u32,
-   block : &mut [bool] , p : &[u32], m : u64 , interval_boundaries : &[u32], phi2 : &mut i64, counter : &[i32], a : u32  )
+ pub fn p2(interval : usize, p2primes :  &mut u32, u : &mut u32, v :  &mut usize, n : u32, w : &mut u32,
+   block : &mut [bool] , p : &[u32], m : u64 , interval_boundaries : &[u32], phi2 : &mut i64, counter : &[i32], a : usize  )
       { 
   *p2primes = 0;
 loop { 
@@ -153,7 +154,7 @@ loop {
     if !block[index] {// println!("*u = {}", *u) ;
     let y : u32 = (m / (*u as u64)) as u32;
     if y +1 >= interval_boundaries[interval + 1] { return ; }  
-    *phi2+= (cnt_query((y + 1 - interval_boundaries[interval]) as usize,counter) + a) as i64 - 1;
+    *phi2+= (cnt_query((y + 1 - interval_boundaries[interval]) as usize,counter) as usize + a) as i64 - 1;
     *p2primes+=1; 
     *v+=1;
     }
@@ -217,12 +218,12 @@ for i in (2..(n as usize +1)).step_by(4) {
 }       
 
 
-pub fn s1b_subst(b : u32, p : &[u32], n : u32, mu : &[i32], m : u64, count : &mut i64) {
+pub fn s1b_subst(b : usize, p : &[u32], n : u32, mu : &[i32], m : u64, count : &mut i64) {
 //PROCEDURE s1b_subst (b : cardinal) ;
 //more general algorithm
 //var term : int64 ; i, pp : cardinal ;   muval1 : shortint ;  total : int64 ;
 //begin
-let pp = p[b as usize + 1]    ;
+let pp = p[b + 1]    ;
 let mut j = maxm((n / pp)as i32, pp as i32) as usize +1 ;
 if j % 2 == 0 { j+=1;} //j -= (j % 2) - 1 ;
 for i in (j..(n+1)as usize).step_by(2) {
@@ -238,7 +239,7 @@ rphi(term, b + 1, 1, p, &mut total)  ;
 }
 
 
-pub fn s2b_init( b : u32, pb : u32, m : u64, t : &mut[u32], n : u32, pi : &[u32], a : u32, d2 : &mut[u32], count : &mut i64, tt : &mut[u8] )  { 
+pub fn s2b_init( b : usize, pb : u32, m : u64, t : &mut[u32], n : u32, pi : &[u32], a : usize, d2 : &mut[u32], count : &mut i64, tt : &mut[u8] )  { 
 //PROCEDURE s2b_init( b: integer);
 //  var
 //    term, pb: cardinal;
@@ -246,14 +247,14 @@ pub fn s2b_init( b : u32, pb : u32, m : u64, t : &mut[u32], n : u32, pi : &[u32]
 //    pb := p[succ(b)];
 let    term = (m / (pb as u64 * pb as u64)) as u32;
     if term <= pb {
-      t[b as usize] = b + 2 ; }
+      t[b] = b as u32 + 2 ; }
     else if term < n {
-      t[b as usize] = pi[(term as usize + 1) >> 1] + 1 ; }
+      t[b] = pi[(term as usize + 1) >> 1] + 1 ; }
     else   {
-      t[b as usize] = a + 1 ; }
-    d2[b as usize] = t[b as usize] - 1 ;
-    *count+= (a - d2[b as usize]) as i64 ;
-    tt[b as usize] = 0;
+      t[b] = a as u32 + 1 ; }
+    d2[b] = t[b] - 1 ;
+    *count+= (a as u32 - d2[b]) as i64 ;
+    tt[b] = 0;
 }
 
   pub fn hard(b :  usize , interval : usize, y : u64, interval_boundaries : &[u32], count : &mut i64, counter : &[i32], s2bprimes : &mut u32, d2 : &mut [u32]) -> bool {
@@ -274,7 +275,7 @@ let    term = (m / (pb as u64 * pb as u64)) as u32;
         if !switch[b] { switch[b]=true; return true; } else {hard(b,interval,y,interval_boundaries,count,counter,s2bprimes,d2); }
       }
       else {
-     let   l = pi[(y as usize + 1) >> 1] - b as u32+ 1;
+     let   l = pi[((y + 1) >> 1) as usize] - b as u32+ 1;
      *count += l as i64;
     d2[b]-=1;
     }
@@ -289,9 +290,9 @@ let    term = (m / (pb as u64 * pb as u64)) as u32;
       }
       else
       {
-     let   l = pi[(y as usize + 1) >> 1] as usize - b + 1;
+     let   l = pi[((y + 1) >> 1) as usize] as usize - b + 1;
       let  term2 = m / (p[b + 1] as u64 * p[b + l] as u64);
-      let  dprime = pi[(term2 as usize + 1) >> 1];
+      let  dprime = pi[((term2 + 1) >> 1) as usize];
           if p[dprime as usize + 1] <= int_sqrt((m / p[b + 1] as u64) as usize) as u32 || dprime <= b as u32 {
       tt[b] = 1;
       *count += l as i64;
