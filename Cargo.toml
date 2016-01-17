@@ -11,6 +11,6 @@ opt-level = 3
 
 name = "silva"
 
-[dependencies.time]
+[dependencies]
 
-git = "https://github.com/rust-lang/time"
+chrono="0.2"
