@@ -2,7 +2,7 @@
 
 name = "silva"
 version = "0.0.1"
-authors = [ "Your name <you@example.com>" ]
+authors = [ "Stephen M. Williams <steve.williams7@ntlworld.com>" ]
 
 [profile.release]
 opt-level = 3
@@ -14,3 +14,4 @@ name = "silva"
 [dependencies]
 
 chrono="0.2"
+bit-vec="*"
