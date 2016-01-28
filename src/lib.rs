@@ -1,4 +1,4 @@
-#![feature(step_by)]
+//#![feature(step_by)]
 
 extern crate bit_vec ;
 
@@ -146,7 +146,8 @@ pub fn special_leaves_type_1_substitute(b : usize, primes : &[usize], n : usize,
 let pp = primes[b + 1]    ; let mut acc = 0 ;
 let mut j = maxm((n / pp) as isize, pp as isize) as usize +1 ;
 if j % 2 == 0 { j += 1;} 
-for i in (j..(n+1)).step_by(2) {
+let mut i = j ; while i <= n {
+//for i in (j..(n+1)).step_by(2) {
 let muval1 = signum(mu[ ( i+1) >> 1 ] ) ;
 if nabs(mu[(i + 1) >> 1]) > pp as isize && muval1 != 0 {
 let term = (m / (i * pp) as u64) as i64;
@@ -154,7 +155,7 @@ let mut total : i64 = 0;
 rphi(term, b + 1, 1, primes, &mut total)  ;
 acc += muval1 as i64 * total ;
 }
-}
+i+=2 ; }
 acc
 }
 
