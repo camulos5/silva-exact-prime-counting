@@ -1,4 +1,4 @@
-#![feature(stmt_expr_attributes)]
+//#![feature(stmt_expr_attributes)]
 extern crate silva ;
 extern crate chrono;
 extern crate bit_vec ;
@@ -85,7 +85,7 @@ for prime in astar..(a - 1) {
     special_leaves_type_2_initialize(prime,primes[prime + 1],m,&mut t,n,&pi,a,&mut d2,&mut count) ;
     special_leaves_type_2(prime,0,&mut s2bprimes,&mut d2,m,&primes,&mut tt,n,&mut switch,&interval_boundaries,&mut count,&counter,&pi);
   }
-/// start of main loop
+// start of main loop
 for interval in intervals {
 cnt_init(&mut counter,interval_length); //fastest
 for (index , prime) in primes.iter().enumerate().skip(1).take(SUBSTITUTE) {
@@ -114,7 +114,7 @@ p2(interval,&mut p2primes,&mut u,&mut v,n,&mut w,&mut block,&primes,m,&interval_
 phi2 += phi[a] as i64 * p2primes as i64;
 phi[a]+=(counter[interval_length - 1] & !SIGNBIT) as u64;
 }
-///end of main loop
+//end of main loop
 println!("prime count for 10 ^ {} = {} ",exponent,count - phi2) ; 
 let end: DateTime<Local> = Local::now();
 println!("{:?}",end - start) ;

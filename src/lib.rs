@@ -74,18 +74,21 @@ pub fn interval_clear(index : usize , offsets : &mut[usize],  counter : &mut[i32
  pub fn initialize_arrays(ll : usize, mu : &mut[isize], pi : &mut [usize],  primes : &mut [usize]) -> usize {
  	for j in  2..mu.len() {
  		if mu[j] == 1 {
- 			for i in (j..ll+2).step_by(2 * j - 1) {
+ 			let mut i = j ; while i <= ll + 1 {
+// 			for i in (j..ll+2).step_by(2 * j - 1) {
  			 mu[i] = match mu[i] {
  				1 => 1 - 2 * j as isize,
  				_ => -mu[i] ,
  			} ;	
- 			}
+ 		i += 2 * j - 1 ;	}
  		}
  	}
  	for j in 2..int_sqrt(ll<<1) {
- 		if mu[j] == 1- 2*j as isize{
- 			for i in ((2*j*j -2*j +1)..ll+2).step_by( 4*j*j -4*j +1 ) {
+ 		if mu[j] == 1- 2*j as isize {
+ 			let mut i = 2 * j * j - 2 * j + 1 ; while i <= ll + 1 {
+// 			for i in ((2*j*j -2*j +1)..ll+2).step_by( 4*j*j -4*j +1 ) {
  			mu[i] = 0 ;	
+ 			i += 4 * j * j - 4 * j + 1 ;
  			}
  		}
  	}
@@ -103,18 +106,20 @@ pi[i as usize]=pix;
  } 
  
  pub fn ordinary_leaves(n : usize, count : &mut i64, mu : &[isize], m : u64) {
-  for i in (1..(n + 1)).step_by(2) {
+ 	let mut i = 1 ; while i <= n {
+//  for i in (1..(n + 1)).step_by(2) {
   	let term1 = signum(mu[(i+1) >> 1]) as i64;
   	if term1 !=0 {
   	*count +=  term1 * (m as i64/ i as i64) ;
   	}
-  }
-for i in (2..(n + 1)).step_by(4) {
+ i += 2 ; }
+  let mut i = 2 ; while i <= n {
+//for i in (2..(n + 1)).step_by(4) {
 	let term2 = signum(mu[((i >> 1)  + 1) >> 1]) as i64 ;
 	if term2 !=0 {
 		*count -= term2 * (m as i64 / i as i64) ;
 		}
-	}
+	i += 4 ;}
 }       
  
 
