@@ -15,3 +15,4 @@ name = "silva"
 
 chrono="0.2"
 bit-vec="*"
+itertools="*"

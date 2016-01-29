@@ -92,8 +92,8 @@ pub fn interval_clear(index : usize , offsets : &mut[usize],  counter : &mut[i32
  			}
  		}
  	}
- 	pi[1] = 0 ; pi[2] = 2 ;
-primes[0] = 1 ; primes[1] = 2 ;
+ 	 pi[2] = 2 ;
+primes[1] = 2 ;
 let mut pix = 1 ;
 for (i , elem) in mu.iter().enumerate().skip(2) {
 if *elem == 1 - 2 * i as isize {

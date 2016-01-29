@@ -1,12 +1,14 @@
 //#![feature(stmt_expr_attributes)]
 extern crate silva ;
-extern crate chrono;
+extern crate chrono ;
 extern crate bit_vec ;
+extern crate itertools ;
 
 use std::io;
 use bit_vec::BitVec;
 use silva::* ;
 use chrono::* ;
+use itertools::* ;
 
 const SIGNBIT : i32 = 1<<31;
 const SUBSTITUTE : usize = 2 ;
@@ -36,7 +38,7 @@ if n > z {
 }
 let mut ll = (n+1) >> 1 ;
 if exponent <= 5 { ll = (m as usize - 1) >> 1; }
-let mut primes : Box<[usize]> = vec!(0;ll + 2).into_boxed_slice() ; 
+let mut primes : Vec<usize> = vec!(1;ll+2) ;
 let mut mu : Vec<isize> = vec![1;ll + 2];
 let mut pi : Vec<usize> = vec![0;ll + 2];
 let pix = initialize_arrays(ll,&mut mu,&mut pi, &mut primes) ;
@@ -46,14 +48,14 @@ let end: DateTime<Local> = Local::now();
 println!("{:?}",end - start) ; 
  continue;
  }
-primes.to_vec().truncate(pix+1) ;
+primes.truncate(pix+1) ;
 let a = pi[(n + 1) >> 1];
 let astar = pi[(int_sqrt(n) + 1) >> 1];
 let lc = ((n as f64).log2()).floor() as u8 ;   
 let  interval_length = (1 << lc) as usize ;
 let  num_intervals = (z / interval_length ) + 1 ;
 let mut interval_boundaries : Vec<usize> = vec![1;num_intervals + 1];
-let mut counter : Vec<i32> = vec![0;interval_length];
+let mut initial : Vec<i32> = vec![0;interval_length];
 let mut m1 : Vec<usize> = vec![n;astar ];
 let mut phi : Vec<u64> = vec![0;a + 1];
 let mut t : Vec<usize> = vec![0;a-1];
@@ -78,26 +80,28 @@ let mut w = u + 1;
 let mut p2primes = 0 ;
 let mut s2bprimes = 0 ;
 let mut endofprimes : usize = a-2 ;
- for prime in 0..(SUBSTITUTE+1) {
- 	count -= special_leaves_type_1_substitute(prime,&primes,n,&mu,m) ; 
+ for index in 0..(SUBSTITUTE+1) {
+ 	count -= special_leaves_type_1_substitute(index,&primes,n,&mu,m) ; 
   }  ;
-for prime in astar..(a - 1) {
-    special_leaves_type_2_initialize(prime,primes[prime + 1],m,&mut t,n,&pi,a,&mut d2,&mut count) ;
-    special_leaves_type_2(prime,0,&mut s2bprimes,&mut d2,m,&primes,&mut tt,n,&mut switch,&interval_boundaries,&mut count,&counter,&pi);
+for index in astar..(a - 1) {
+    special_leaves_type_2_initialize(index,primes[index + 1],m,&mut t,n,&pi,a,&mut d2,&mut count) ;
+    special_leaves_type_2(index,0,&mut s2bprimes,&mut d2,m,&primes,&mut tt,n,&mut switch,&interval_boundaries,&mut count,&initial,&pi);
   }
+	initial.iter_mut().into_rc().enumerate().map( |(i,e)| {*e = (i as i32 +1) & !(i as i32) } ).collect_vec() ;
+
 // start of main loop
 for interval in intervals {
-cnt_init(&mut counter,interval_length); //fastest
-for (index , prime) in primes.iter().enumerate().skip(1).take(SUBSTITUTE) {
-  interval_clear(index,&mut offsets,&mut counter,interval_length,*prime) ; 
+let mut	 counter = &mut initial.clone() ;
+for index in 1..SUBSTITUTE+1 {
+  interval_clear(index,&mut offsets,&mut counter,interval_length,primes[index]) ; 
     }
-for (index , prime) in primes.iter().enumerate().skip(SUBSTITUTE + 1).take(astar - 1 - SUBSTITUTE) {
-    interval_clear(index,&mut offsets,&mut counter,interval_length,*prime) ;
+for index in SUBSTITUTE+1..astar {
+    interval_clear(index,&mut offsets,&mut counter,interval_length,primes[index]) ;
 	special_leaves_type_1(index,interval,&mut m1,n,primes[index + 1],m,&interval_boundaries,&mu,&mut count,&phi,&counter) ;
 	phi[index]+=(counter[interval_length - 1] & !SIGNBIT) as u64;
 }
-for (index , prime) in primes.iter().enumerate().skip(astar).take(a - 2 - astar) {
-    interval_clear(index,&mut offsets,&mut counter,interval_length,*prime) ;
+for index in astar..a-2 {
+    interval_clear(index,&mut offsets,&mut counter,interval_length,primes[index]) ;
      if switch[index] {
  		special_leaves_type_2(index,interval,&mut s2bprimes,&mut d2,m,&primes,&mut tt,n,&mut switch,&interval_boundaries,&mut count,&counter,&pi);
  		count += (s2bprimes as u64 * phi[index]) as i64 ;
@@ -108,8 +112,8 @@ for (index , prime) in primes.iter().enumerate().skip(astar).take(a - 2 - astar)
       	endofprimes=index; break;
       }
 }
-for (index , prime) in primes.iter().enumerate().skip(endofprimes+1).take(a - endofprimes) {
-	interval_clear(index,&mut offsets,&mut counter,interval_length,*prime) ; } 
+for index in endofprimes+1..a+1 {
+	interval_clear(index,&mut offsets,&mut counter,interval_length,primes[index]) ; } 
 p2(interval,&mut p2primes,&mut u,&mut v,n,&mut w,&mut block,&primes,m,&interval_boundaries,&mut phi2,&counter,a)  ;
 phi2 += phi[a] as i64 * p2primes as i64;
 phi[a]+=(counter[interval_length - 1] & !SIGNBIT) as u64;
