@@ -98,14 +98,14 @@ for index in 1..SUBSTITUTE+1 {
 for index in SUBSTITUTE+1..astar {
     interval_clear(index,&mut offsets,&mut counter,interval_length,primes[index]) ;
 	special_leaves_type_1(index,interval,&mut m1,n,primes[index + 1],m,&interval_boundaries,&mu,&mut count,&phi,&counter) ;
-	phi[index]+=(counter[interval_length - 1] & !SIGNBIT) as u64;
+	phi[index] += (counter[interval_length - 1] & !SIGNBIT) as u64;
 }
 for index in astar..a-2 {
     interval_clear(index,&mut offsets,&mut counter,interval_length,primes[index]) ;
      if switch[index] {
  		special_leaves_type_2(index,interval,&mut s2bprimes,&mut d2,m,&primes,&mut tt,n,&mut switch,&interval_boundaries,&mut count,&counter,&pi);
  		count += (s2bprimes as u64 * phi[index]) as i64 ;
- 		phi[index]+= (counter[interval_length - 1] & !SIGNBIT) as u64;
+ 		phi[index] += (counter[interval_length - 1] & !SIGNBIT) as u64;
      }
      else
       {
@@ -116,7 +116,7 @@ for index in endofprimes+1..a+1 {
 	interval_clear(index,&mut offsets,&mut counter,interval_length,primes[index]) ; } 
 p2(interval,&mut p2primes,&mut u,&mut v,n,&mut w,&mut block,&primes,m,&interval_boundaries,&mut phi2,&counter,a)  ;
 phi2 += phi[a] as i64 * p2primes as i64;
-phi[a]+=(counter[interval_length - 1] & !SIGNBIT) as u64;
+phi[a] += (counter[interval_length - 1] & !SIGNBIT) as u64;
 }
 //end of main loop
 println!("prime count for 10 ^ {} = {} ",exponent,count - phi2) ; 

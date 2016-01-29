@@ -1,30 +1,14 @@
 //#![feature(step_by)]
-
 extern crate bit_vec ;
 
 use bit_vec::BitVec;
+use std::cmp ;
 
 const SIGNBIT : i32 = 1<<31;
 
 pub fn modneg( x : i64, y : usize) -> usize {
 	(( x % y as i64) + y as i64) as usize % y
 	}
-
- pub fn signum(n : isize) -> i8 {
- 	if n < 0 { -1 }
- 	else if n > 0 { 1 }
- 	else { 0 }
- 	}
- 
- 
- pub fn nabs(n : isize) -> isize {
- 	if n < 0 { -n } else { n }
- 	//(n & !(1<<31)) as u32
- }
- 
- pub fn maxm(m : isize , n :isize) -> isize {
- 	if m>= n {m} else {n}
- }
 
 
 pub fn int_sqrt(n :usize) -> usize {
@@ -52,13 +36,6 @@ pub fn cnt_update(mut pos : usize, counter : &mut[i32], interval_length : usize 
       if pos >=interval_length {break;}
     }
     }
-
-#[inline]
-pub fn cnt_init(counter : &mut [i32] , interval_length : usize) {
-	for i in 0..interval_length as i32 {
-		counter[i as usize] = (i+1) & !i ;
-	}
-}
 
 #[inline]
 pub fn interval_clear(index : usize , offsets : &mut[usize],  counter : &mut[i32], interval_length : usize, prime : usize) {
@@ -108,14 +85,14 @@ pi[i as usize]=pix;
  pub fn ordinary_leaves(n : usize, count : &mut i64, mu : &[isize], m : u64) {
  	let mut i = 1 ; while i <= n {
 //  for i in (1..(n + 1)).step_by(2) {
-  	let term1 = signum(mu[(i+1) >> 1]) as i64;
+  	let term1 = (mu[(i+1) >> 1]).signum() as i64;
   	if term1 !=0 {
   	*count +=  term1 * (m as i64/ i as i64) ;
   	}
  i += 2 ; }
   let mut i = 2 ; while i <= n {
 //for i in (2..(n + 1)).step_by(4) {
-	let term2 = signum(mu[((i >> 1)  + 1) >> 1]) as i64 ;
+	let term2 = (mu[((i >> 1)  + 1) >> 1]).signum() as i64 ;
 	if term2 !=0 {
 		*count -= term2 * (m as i64 / i as i64) ;
 		}
@@ -144,12 +121,12 @@ pi[i as usize]=pix;
  
 pub fn special_leaves_type_1_substitute(b : usize, primes : &[usize], n : usize, mu : &[isize], m : u64) -> i64 {
 let pp = primes[b + 1]    ; let mut acc = 0 ;
-let mut j = maxm((n / pp) as isize, pp as isize) as usize +1 ;
+let mut j = cmp::max((n / pp) , pp ) as usize +1 ;
 if j % 2 == 0 { j += 1;} 
 let mut i = j ; while i <= n {
 //for i in (j..(n+1)).step_by(2) {
-let muval1 = signum(mu[ ( i+1) >> 1 ] ) ;
-if nabs(mu[(i + 1) >> 1]) > pp as isize && muval1 != 0 {
+let muval1 = (mu[ ( i+1) >> 1 ] ).signum() ;
+if (mu[(i + 1) >> 1]).abs() > pp as isize && muval1 != 0 {
 let term = (m / (i * pp) as u64) as i64;
 let mut total : i64 = 0;
 rphi(term, b + 1, 1, primes, &mut total)  ;
@@ -158,7 +135,7 @@ acc += muval1 as i64 * total ;
 i+=2 ; }
 acc
 }
-
+#[inline]
 pub fn special_leaves_type_1( b : usize , interval : usize ,  m1 : &mut [usize] , n : usize, pp : usize , m : u64 ,
  	 interval_boundaries : &[usize], mu : &[isize], count : &mut i64, phi : &[u64], counter : &[i32]) { 
 if m1[b] % 2 == 0 { m1[b] -= 1;} 
@@ -167,15 +144,15 @@ while m1[b] > criterion {
    let y  = (m / (m1[b] as u64 * pp as u64 )) as usize  ; //print!("y = {} ",y) ;
    if y > interval_boundaries[interval + 1] - 2 { return ;} 
    let   muvalue = mu[((m1[b]+1) >> 1) as usize]; 
-   if nabs(muvalue) > pp as isize  {
+   if muvalue.abs() > pp as isize  {
         *count -=  
-        signum(muvalue) as i64 * (phi[b] as i64 + cnt_query((y + 1 - interval_boundaries[interval]), counter) as i64);
+        muvalue.signum() as i64 * (phi[b] as i64 + cnt_query((y + 1 - interval_boundaries[interval]), counter) as i64);
    } 
    m1[b] -= 2 ;
       }
   } 
  	 
- 
+ #[inline]
 pub fn special_leaves_type_2_initialize( b : usize, pb : usize, m : u64, t : &mut[usize], n : usize, pi : &[usize], a : usize, d2 : &mut[usize], count : &mut i64 )  { 
 let    term = (m / (pb as u64 * pb as u64)) as usize;
 t[b] = match  term {
@@ -186,7 +163,7 @@ t[b] = match  term {
 d2[b] = t[b] - 1 ;
 *count += (a - d2[b]) as i64 ;
 }
-
+#[inline]
 pub fn hard(b :  usize , interval : usize, y : usize, interval_boundaries : &[usize], count : &mut i64, counter : &[i32], s2bprimes : &mut usize, d2 : &mut [usize]) -> bool {
     if y + 1 >= interval_boundaries[interval+1] {return true; }
     *count+= cnt_query((y + 1 - interval_boundaries[interval]),counter) as i64;
@@ -195,7 +172,7 @@ pub fn hard(b :  usize , interval : usize, y : usize, interval_boundaries : &[us
     false
     }
    
-   
+ #[inline]  
 pub fn easy_sparse(b :  usize , interval : usize, y : usize, n : usize, tt : &mut[u8], switch : &mut [bool],interval_boundaries : &[usize],
 	 count : &mut i64, counter : &[i32], s2bprimes : &mut usize, d2 : &mut [usize], pi : &[usize] ) -> bool  {
       if y >= n {
@@ -208,7 +185,7 @@ pub fn easy_sparse(b :  usize , interval : usize, y : usize, n : usize, tt : &mu
       }
     false
     }
-   
+#[inline]   
 pub fn easy_clustered(b :  usize , interval : usize, y : usize, n : usize, tt: &mut[u8], switch : &mut [bool], interval_boundaries : &[usize],
 	 count : &mut i64, counter : &[i32], s2bprimes : &mut usize, d2 : &mut [usize], m : u64, pi : &[usize], p : &[usize] ) -> bool  {
      if y >= n {
@@ -233,7 +210,7 @@ pub fn easy_clustered(b :  usize , interval : usize, y : usize, n : usize, tt: &
     false
       } 
     
-    
+  #[inline]  
     pub fn special_leaves_type_2(b: usize, interval : usize, s2bprimes : &mut usize, d2 : &mut[usize], m : u64, p : &[usize], tt : &mut[u8],
     	 n : usize, switch : &mut[bool], interval_boundaries : &[usize], count : &mut i64, counter : &[i32], pi : &[usize] )   {
     *s2bprimes= 0;
@@ -251,7 +228,7 @@ pub fn easy_clustered(b :  usize , interval : usize, y : usize, n : usize, tt: &
       }
      } 
 
-       
+  #[inline]     
  pub fn sieve2( x : usize, y : usize,   p : &[usize],  block : &mut BitVec )
   { 
 block.clear();
@@ -265,7 +242,7 @@ block.clear();
        i+=1 ; 
     } 
 }
- 
+ #[inline]
  pub fn p2(interval : usize, p2primes :  &mut usize, u : &mut usize, v :  &mut usize, n : usize, w : &mut usize,
    block : &mut BitVec , p : &[usize], m : u64 , interval_boundaries : &[usize], phi2 : &mut i64, counter : &[i32], a : usize  )
       { 
@@ -273,7 +250,7 @@ block.clear();
 loop { 
     if *u <= n { *phi2 -= (*v as i64 * (*v - 1) as i64) >> 1 ; return;}
    	if *u  < *w  {
-   		*w = maxm(2,(*u -n) as isize) as usize; 
+   		*w = cmp::max(2,*u -n); 
    		sieve2(*w,*u+1,p,block) ;
    		    } 
 	let index = *u-*w+1;
