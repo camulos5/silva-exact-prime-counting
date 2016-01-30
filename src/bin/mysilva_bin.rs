@@ -38,9 +38,9 @@ if n > z {
 }
 let mut ll = (n+1) >> 1 ;
 if exponent <= 5 { ll = (m as usize - 1) >> 1; }
-let mut primes : Vec<usize> = vec!(1;ll+2) ;
-let mut mu : Vec<isize> = vec![1;ll + 2];
-let mut pi : Vec<usize> = vec![0;ll + 2];
+let mut primes : Vec<usize> = vec!(1;ll+1) ;
+let mut mu : Vec<isize> = vec![1;ll + 1];
+let mut pi : Vec<usize> = vec![0;ll + 1];
 let pix = initialize_arrays(ll,&mut mu,&mut pi, &mut primes) ;
 if exponent <= 5 {  
  println!("prime count = {} ", pix) ;
@@ -90,17 +90,18 @@ for index in astar..(a - 1) {
 	initial.iter_mut().into_rc().enumerate().foreach( |(i,e)| {*e = (i as i32 +1) & !(i as i32) } ) ;
 
 // start of main loop
-for interval in intervals {
+intervals.iter().foreach( |&interval|
+{
 let mut	 counter = &mut initial.clone() ;
-for index in 1..SUBSTITUTE+1 {
-  interval_clear(index,&mut offsets,&mut counter,interval_length,primes[index]) ; 
-    }
-for index in SUBSTITUTE+1..astar {
+(1..SUBSTITUTE+1).foreach( |index|
+  interval_clear(index,&mut offsets,&mut counter,interval_length,primes[index])
+);
+(SUBSTITUTE+1..astar).foreach( |index| {
     interval_clear(index,&mut offsets,&mut counter,interval_length,primes[index]) ;
 	special_leaves_type_1(index,interval,&mut m1,n,primes[index + 1],m,&interval_boundaries,&mu,&mut count,&phi,&counter) ;
-	phi[index] += (counter[interval_length - 1] & !SIGNBIT) as u64;
-}
-for index in astar..a-2 {
+	phi[index] += (counter[interval_length - 1] & !SIGNBIT) as u64 ; }
+ ) ;
+(astar..a-1).foreach( |index| {
     interval_clear(index,&mut offsets,&mut counter,interval_length,primes[index]) ;
      if switch[index] {
  		special_leaves_type_2(index,interval,&mut s2bprimes,&mut d2,m,&primes,&mut tt,n,&mut switch,&interval_boundaries,&mut count,&counter,&pi);
@@ -109,15 +110,16 @@ for index in astar..a-2 {
      }
      else
       {
-      	endofprimes=index; break;
+      	endofprimes=index; return ;
       }
-}
-for index in endofprimes+1..a+1 {
-	interval_clear(index,&mut offsets,&mut counter,interval_length,primes[index]) ; } 
+} ) ;
+(endofprimes+1..a+1).foreach( |index|
+	interval_clear(index,&mut offsets,&mut counter,interval_length,primes[index]) ) ;
 p2(interval,&mut p2primes,&mut u,&mut v,n,&mut w,&mut block,&primes,m,&interval_boundaries,&mut phi2,&counter,a)  ;
 phi2 += phi[a] as i64 * p2primes as i64;
 phi[a] += (counter[interval_length - 1] & !SIGNBIT) as u64;
 }
+);
 //end of main loop
 println!("prime count for 10 ^ {} = {} ",exponent,count - phi2) ; 
 let end: DateTime<Local> = Local::now();
