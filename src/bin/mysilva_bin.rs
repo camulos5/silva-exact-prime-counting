@@ -88,38 +88,23 @@ for index in astar..(a - 1) {
     special_leaves_type_2(index,0,&mut s2bprimes,&mut d2,m,&primes,&mut tt,n,&mut switch,&interval_boundaries,&mut count,&initial,&pi);
   }
 	initial.iter_mut().into_rc().enumerate().foreach( |(i,e)| {*e = (i as i32 +1) & !(i as i32) } ) ;
-
 // start of main loop
-intervals.iter().foreach( |&interval|
-{
+intervals.iter().foreach( |&interval| {
 let mut	 counter = &mut initial.clone() ;
-(1..SUBSTITUTE+1).foreach( |index|
-  interval_clear(index,&mut offsets,&mut counter,interval_length,primes[index])
-);
-(SUBSTITUTE+1..astar).foreach( |index| {
-    interval_clear(index,&mut offsets,&mut counter,interval_length,primes[index]) ;
+(1..a + 1).foreach( |index| {
+  interval_clear(index,&mut offsets,&mut counter,interval_length,primes[index]) ;
+if index > SUBSTITUTE && index < astar {
 	special_leaves_type_1(index,interval,&mut m1,n,primes[index + 1],m,&interval_boundaries,&mu,&mut count,&phi,&counter) ;
-	phi[index] += (counter[interval_length - 1] & !SIGNBIT) as u64 ; }
- ) ;
-(astar..a-1).foreach( |index| {
-    interval_clear(index,&mut offsets,&mut counter,interval_length,primes[index]) ;
+	phi[index] += (counter[interval_length - 1] & !SIGNBIT) as u64 ; } 
+if index >= astar && index <= endofprimes {
      if switch[index] {
  		special_leaves_type_2(index,interval,&mut s2bprimes,&mut d2,m,&primes,&mut tt,n,&mut switch,&interval_boundaries,&mut count,&counter,&pi);
  		count += (s2bprimes as u64 * phi[index]) as i64 ;
- 		phi[index] += (counter[interval_length - 1] & !SIGNBIT) as u64;
-     }
-     else
-      {
-      	endofprimes=index; return ;
-      }
-} ) ;
-(endofprimes+1..a+1).foreach( |index|
-	interval_clear(index,&mut offsets,&mut counter,interval_length,primes[index]) ) ;
+ 		phi[index] += (counter[interval_length - 1] & !SIGNBIT) as u64;      }
+     else  { endofprimes=index; return ;    } } } ) ;
 p2(interval,&mut p2primes,&mut u,&mut v,n,&mut w,&mut block,&primes,m,&interval_boundaries,&mut phi2,&counter,a)  ;
 phi2 += phi[a] as i64 * p2primes as i64;
-phi[a] += (counter[interval_length - 1] & !SIGNBIT) as u64;
-}
-);
+phi[a] += (counter[interval_length - 1] & !SIGNBIT) as u64; } );
 //end of main loop
 println!("prime count for 10 ^ {} = {} ",exponent,count - phi2) ; 
 let end: DateTime<Local> = Local::now();
