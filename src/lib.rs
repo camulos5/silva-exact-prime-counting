@@ -1,8 +1,13 @@
-//#![feature(step_by)]
+//#![feature(step_trait)]
+
 extern crate bit_vec ;
+extern crate itertools ;
+extern crate core ;
 
 use bit_vec::BitVec;
 use std::cmp ;
+use itertools::Itertools ;
+//use core::iter::Step ;
 
 const SIGNBIT : i32 = 1<<31;
 
@@ -39,6 +44,8 @@ pub fn cnt_update(mut pos : usize, counter : &mut[i32], interval_length : usize 
 
 #[inline]
 pub fn interval_clear(index : usize , offsets : &mut[usize],  counter : &mut[i32], interval_length : usize, prime : usize) {
+//   (offsets[index]..interval_length).step(prime).foreach(|j| {    	if counter[j] > 0 { cnt_update( j, counter, interval_length ) ; } }) ;
+  
    let mut j  = offsets[index] ;
    while j < interval_length {
    	if counter[j] > 0 { cnt_update( j, counter, interval_length ) ; }
@@ -60,7 +67,7 @@ pub fn interval_clear(index : usize , offsets : &mut[usize],  counter : &mut[i32
  		i += 2 * j - 1 ;	}
  		}
  	}
- 	for j in 2..int_sqrt(ll<<1) {
+ 	let mut j = 2 ; while j * j <= (ll<<1) {
  		if mu[j] == 1- 2*j as isize {
  			let mut i = 2 * j * j - 2 * j + 1 ; while i <= ll + 1 {
 // 			for i in ((2*j*j -2*j +1)..ll+2).step_by( 4*j*j -4*j +1 ) {
@@ -68,11 +75,11 @@ pub fn interval_clear(index : usize , offsets : &mut[usize],  counter : &mut[i32
  			i += 4 * j * j - 4 * j + 1 ;
  			}
  		}
+ 		j += 1 ;
  	}
- 	 pi[2] = 2 ;
 primes[1] = 2 ;
 let mut pix = 1 ;
-for (i , elem) in mu.iter().enumerate().skip(2) {
+for (i , elem) in mu.iter().enumerate().dropping(2) {
 if *elem == 1 - 2 * i as isize {
  	pix += 1;
  	primes[pix] = 2 * i as usize -1 ;

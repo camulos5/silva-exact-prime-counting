@@ -5,11 +5,17 @@ version = "0.0.1"
 authors = [ "Stephen M. Williams <steve.williams7@ntlworld.com>" ]
 
 [profile.release]
-opt-level = 3
+
+[lib]
+
+name = "mysilva"
+
+path = "src/lib.rs"
 
 [[bin]]
 
-name = "silva"
+name = "mysilva_bin"
+
 
 [dependencies]
 

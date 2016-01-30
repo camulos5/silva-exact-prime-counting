@@ -1,17 +1,17 @@
 //#![feature(stmt_expr_attributes)]
-extern crate silva ;
+extern crate mysilva ;
 extern crate chrono ;
 extern crate bit_vec ;
 extern crate itertools ;
 
 use std::io;
-use bit_vec::BitVec;
-use silva::* ;
+use bit_vec::BitVec ;
+use mysilva::* ;
 use chrono::* ;
-use itertools::* ;
+use itertools::Itertools ;
 
 const SIGNBIT : i32 = 1<<31;
-const SUBSTITUTE : usize = 2 ;
+const SUBSTITUTE : usize = 4 ;
 
 fn main() {
 'foo : loop {
@@ -51,7 +51,7 @@ println!("{:?}",end - start) ;
 primes.truncate(pix+1) ;
 let a = pi[(n + 1) >> 1];
 let astar = pi[(int_sqrt(n) + 1) >> 1];
-let lc = ((n as f64).log2()).floor() as u8 ;   
+let lc = (n as f64).log2().floor() as u8 ;   
 let  interval_length = (1 << lc) as usize ;
 let  num_intervals = (z / interval_length ) + 1 ;
 let mut interval_boundaries : Vec<usize> = vec![1;num_intervals + 1];
@@ -65,11 +65,10 @@ let mut offsets : Vec<usize> = vec![0;a + 1];
 let mut block : BitVec = BitVec::from_elem(n+3,false);
 let mut switch : Vec<bool> = vec![false;a + 1];
 let mut  count : i64 = a as i64 - 1;
-let intervals = (0..num_intervals).collect::<Vec<usize>>() ;
-for i in 1..num_intervals { interval_boundaries[i] = 1 + (i * interval_length); }
+let intervals = (0..num_intervals).collect_vec() ;
+(1..num_intervals).foreach(|i| { interval_boundaries[i] = 1 + (i * interval_length); }) ;
 interval_boundaries[num_intervals] = z;
-ordinary_leaves(n,&mut count,&mu,m);
-let mut  phi2 : i64 = (a as i64* (a as i64 - 1)) >> 1;
+let mut  phi2 = (a as i64* (a as i64 - 1)) >> 1;
 let mut u = match exponent % 2 {
  0 =>  10usize.pow(exponent/2) - 1,
  _  => 10.0_f64.powf(exponent as f64 / 2.0).floor() as usize,
@@ -80,14 +79,15 @@ let mut w = u + 1;
 let mut p2primes = 0 ;
 let mut s2bprimes = 0 ;
 let mut endofprimes : usize = a-2 ;
- for index in 0..(SUBSTITUTE+1) {
+ordinary_leaves(n,&mut count,&mu,m);
+for index in 0..(SUBSTITUTE+1) {
  	count -= special_leaves_type_1_substitute(index,&primes,n,&mu,m) ; 
   }  ;
 for index in astar..(a - 1) {
     special_leaves_type_2_initialize(index,primes[index + 1],m,&mut t,n,&pi,a,&mut d2,&mut count) ;
     special_leaves_type_2(index,0,&mut s2bprimes,&mut d2,m,&primes,&mut tt,n,&mut switch,&interval_boundaries,&mut count,&initial,&pi);
   }
-	initial.iter_mut().into_rc().enumerate().map( |(i,e)| {*e = (i as i32 +1) & !(i as i32) } ).collect_vec() ;
+	initial.iter_mut().into_rc().enumerate().foreach( |(i,e)| {*e = (i as i32 +1) & !(i as i32) } ) ;
 
 // start of main loop
 for interval in intervals {
