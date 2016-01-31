@@ -1,5 +1,5 @@
 # silva-exact-prime-counting
-A Rust implementation of the algorithm of Tomas Oliveira e Silva for exact prime counting
+A Rust implementation of the algorithm of Tomás Oliveira e Silva for exact prime counting
 
 When run from the command-line with 'cargo run --release' on a computer with Rust installed, this program prompts for an integer between 1 and 17. It will then output the exact number of primes below that power (e) of 10, that is _π(x)_ where _x_ is 10^e. Then the user is prompted for another integer. To break the loop and return to the command prompt, Ctrl+C. 
 
