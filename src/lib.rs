@@ -105,7 +105,7 @@ for i in (2..n + 1).step(4) {
 let mut it = (1..n+1).filter(|&i| i%4 != 0) ;
 it.foreach(|i| {if i % 2 == 1 
 		{let term = (mu[(i+1) >> 1]).signum() as i64;
-  	*count +=  term * (m as i64/ i as i64) ;}
+  	*count +=  term * (m as i64 / i as i64) ;}
 		 else { let term = (mu[((i >> 1)  + 1) >> 1]).signum() as i64 ;
 	*count -= term * (m as i64 / i as i64) ;} })
 }
@@ -131,7 +131,7 @@ it.foreach(|i| {if i % 2 == 1
  
 pub fn special_leaves_type_1_substitute(b : usize, primes : &[usize], n : usize, mu : &[isize], m : u64) -> i64 {
 let pp = primes[b + 1]    ; let mut acc = 0 ;
-let mut j = cmp::max((n / pp) , pp ) as usize +1 ;
+let mut j = cmp::max((n / pp) , pp ) as usize + 1 ;
 if j % 2 == 0 { j += 1;} 
 let mut i = j ; while i <= n {
 //for i in (j..(n+1)).step_by(2) {
@@ -145,6 +145,7 @@ acc += muval1 as i64 * total ;
 i+=2 ; }
 acc
 }
+
 #[inline]
 pub fn special_leaves_type_1( b : usize , interval : usize ,  m1 : &mut [usize] , n : usize, pp : usize , m : u64 ,
  	 interval_boundaries : &[usize], mu : &[isize], count : &mut i64, phi : &[u64], counter : &[i32]) { 
@@ -153,11 +154,8 @@ let criterion = n / pp ;
 while m1[b] > criterion {
    let y  = (m / (m1[b] as u64 * pp as u64 )) as usize  ; //print!("y = {} ",y) ;
    if y > interval_boundaries[interval + 1] - 2 { return ;} 
-   let   muvalue = mu[((m1[b]+1) >> 1) as usize]; 
-   if muvalue.abs() > pp as isize  {
-        *count -=  
-        muvalue.signum() as i64 * (phi[b] as i64 + cnt_query((y + 1 - interval_boundaries[interval]), counter) as i64);
-   } 
+   let   muvalue = mu[((m1[b]+1) >> 1)]; 
+   if muvalue.abs() > pp as isize { *count -=  muvalue.signum() as i64 * (phi[b] as i64 + cnt_query((y + 1 - interval_boundaries[interval]), counter) as i64);} 
    m1[b] -= 2 ;
       }
   } 
@@ -194,6 +192,7 @@ pub fn easy_sparse(b :  usize , interval : usize, y : usize, n : usize, tt : &mu
       }
     false
     }
+	 
 #[inline]   
 pub fn easy_clustered(b :  usize , interval : usize, y : usize, n : usize, tt: &mut[u8], switch : &mut [bool], interval_boundaries : &[usize],
 	 count : &mut i64, counter : &[i32], d2 : &mut [usize], m : u64, pi : &[usize], p : &[usize] ) -> bool  {
@@ -242,16 +241,18 @@ pub fn easy_clustered(b :  usize , interval : usize, y : usize, n : usize, tt: &
  pub fn sieve2( x : usize, y : usize,   p : &[usize],  block : &mut BitVec )
   { 
 block.clear();
-   let mut i : usize = 1; 
+   let mut i  = 1 ; 
     while p[i] * p[i] <= y {
     let mut offset = modneg(1-x as i64,p[i]);
+//    (offset..2+y-x).step(p[i]).foreach(|j| block.set(j,true) ) ; much slower
        while offset <= 1+(y-x)  { 
     	 block.set(offset,true);
          offset += p[i];
         }
-       i+=1 ; 
+       i += 1 ; 
     } 
 }
+  
  #[inline]
  pub fn p2(interval : usize, u : &mut usize, v :  &mut usize, n : usize, w : &mut usize,
    block : &mut BitVec , p : &[usize], m : u64 , interval_boundaries : &[usize], phi2 : &mut i64, counter : &[i32], a : usize  ) -> u32

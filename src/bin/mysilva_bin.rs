@@ -76,7 +76,7 @@ let mut u = match exponent % 2 {
 if u % 2 == 0 { u -= 1;}
 let mut v = a;
 let mut w = u + 1;
-let mut endofprimes = a - 2 ;
+let mut endofprimes = a -2 ;
 ordinary_leaves(n,&mut count,&mu,m);
 for index in 0..(SUBSTITUTE+1) {
  	count -= special_leaves_type_1_substitute(index,&primes,n,&mu,m) ; 
