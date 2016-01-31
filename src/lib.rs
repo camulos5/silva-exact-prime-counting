@@ -165,10 +165,9 @@ d2[b] = t[b] - 1 ;
 *count += (a - d2[b]) as i64 ;
 }
 #[inline]
-pub fn hard(b :  usize , interval : usize, y : usize, interval_boundaries : &[usize], count : &mut i64, counter : &[i32], d2 : &mut [usize]) -> ( bool,u32) {
+pub fn hard(b :  usize , interval : usize, y : usize, interval_boundaries : &[usize], count : &mut i64, counter : &[i32], d2 : &mut [usize]) -> ( bool, u32) {
     if y + 1 >= interval_boundaries[interval+1] {return (true,0); }
     *count+= cnt_query((y + 1 - interval_boundaries[interval]),counter) as i64;
-//    *s2bprimes += 1 ;
     d2[b] -= 1;
    ( false, 1 )
     }
@@ -224,7 +223,7 @@ pub fn easy_clustered(b :  usize , interval : usize, y : usize, n : usize, tt: &
           0 => { if easy_clustered(b, interval,y,n,tt,switch,interval_boundaries,count,counter,d2,m,pi,p) { return s2bprimes;} continue ; } ,
           1 => { if easy_sparse(b,interval,y,n,tt,switch,interval_boundaries,count,counter,d2,pi) { return s2bprimes; }  continue ; } ,
           _ => { let h = hard(b,interval,y,interval_boundaries,count,counter,d2) ;
-                 if (interval > 0 || counter[1] > 0) && h.0 { return s2bprimes;} else {s2bprimes += h.1 ;} continue ; } ,
+                 if (interval > 0 || counter[1] > 0) && h.0 { return s2bprimes;} s2bprimes += h.1 ; continue ; } ,
 }
       }             
       }
