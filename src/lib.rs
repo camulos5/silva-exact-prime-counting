@@ -165,19 +165,19 @@ d2[b] = t[b] - 1 ;
 *count += (a - d2[b]) as i64 ;
 }
 #[inline]
-pub fn hard(b :  usize , interval : usize, y : usize, interval_boundaries : &[usize], count : &mut i64, counter : &[i32], s2bprimes : &mut usize, d2 : &mut [usize]) -> bool {
-    if y + 1 >= interval_boundaries[interval+1] {return true; }
+pub fn hard(b :  usize , interval : usize, y : usize, interval_boundaries : &[usize], count : &mut i64, counter : &[i32], d2 : &mut [usize]) -> ( bool,u32) {
+    if y + 1 >= interval_boundaries[interval+1] {return (true,0); }
     *count+= cnt_query((y + 1 - interval_boundaries[interval]),counter) as i64;
-    *s2bprimes += 1 ;
+//    *s2bprimes += 1 ;
     d2[b] -= 1;
-    false
+   ( false, 1 )
     }
    
  #[inline]  
 pub fn easy_sparse(b :  usize , interval : usize, y : usize, n : usize, tt : &mut[u8], switch : &mut [bool],interval_boundaries : &[usize],
-	 count : &mut i64, counter : &[i32], s2bprimes : &mut usize, d2 : &mut [usize], pi : &[usize] ) -> bool  {
+	 count : &mut i64, counter : &[i32], d2 : &mut [usize], pi : &[usize] ) -> bool  {
       if y >= n {
-         if !switch[b] { switch[b]=true; return true; } else { tt[b] = 2 ; hard(b,interval,y,interval_boundaries,count,counter,s2bprimes,d2); }
+         if !switch[b] { switch[b]=true; return true; } else { tt[b] = 2 ; hard(b,interval,y,interval_boundaries,count,counter,d2); }
       }
       else {
          let l = pi[((y + 1) >> 1)] - b + 1;
@@ -188,9 +188,9 @@ pub fn easy_sparse(b :  usize , interval : usize, y : usize, n : usize, tt : &mu
     }
 #[inline]   
 pub fn easy_clustered(b :  usize , interval : usize, y : usize, n : usize, tt: &mut[u8], switch : &mut [bool], interval_boundaries : &[usize],
-	 count : &mut i64, counter : &[i32], s2bprimes : &mut usize, d2 : &mut [usize], m : u64, pi : &[usize], p : &[usize] ) -> bool  {
+	 count : &mut i64, counter : &[i32], d2 : &mut [usize], m : u64, pi : &[usize], p : &[usize] ) -> bool  {
      if y >= n {
-        if !switch[b] { switch[b]=true; return true; } else { tt[b] = 2 ; hard(b,interval,y,interval_boundaries,count,counter,s2bprimes,d2); }
+        if !switch[b] { switch[b]=true; return true; } else { tt[b] = 2 ; hard(b,interval,y,interval_boundaries,count,counter,d2); }
       }
      else
       {
@@ -212,20 +212,21 @@ pub fn easy_clustered(b :  usize , interval : usize, y : usize, n : usize, tt: &
       } 
     
   #[inline]  
-    pub fn special_leaves_type_2(b: usize, interval : usize, s2bprimes : &mut usize, d2 : &mut[usize], m : u64, p : &[usize], tt : &mut[u8],
-    	 n : usize, switch : &mut[bool], interval_boundaries : &[usize], count : &mut i64, counter : &[i32], pi : &[usize] )   {
-    *s2bprimes= 0;
+    pub fn special_leaves_type_2(b: usize, interval : usize, d2 : &mut[usize], m : u64, p : &[usize], tt : &mut[u8],
+    	 n : usize, switch : &mut[bool], interval_boundaries : &[usize], count : &mut i64, counter : &[i32], pi : &[usize] )  -> u32 {
+    let mut s2bprimes= 0;
      loop {
-      if d2[b] == b + 1 {return ; }
+      if d2[b] == b + 1 {return s2bprimes; }
       else
       {
        let y = (m / (p[b + 1] as u64 * p[d2[b]] as u64)) as usize;
        match tt[b] {
-          0 => { if easy_clustered(b, interval,y,n,tt,switch,interval_boundaries,count,counter,s2bprimes,d2,m,pi,p) { return;} continue ; } ,
-          1 => { if easy_sparse(b,interval,y,n,tt,switch,interval_boundaries,count,counter,s2bprimes,d2,pi) { return ; }  continue ; } ,
-          _ => { if (interval > 0 || counter[1] > 0) && hard(b,interval,y,interval_boundaries,count,counter,s2bprimes,d2) {return;} continue ; } ,
-          }
-      }                           
+          0 => { if easy_clustered(b, interval,y,n,tt,switch,interval_boundaries,count,counter,d2,m,pi,p) { return s2bprimes;} continue ; } ,
+          1 => { if easy_sparse(b,interval,y,n,tt,switch,interval_boundaries,count,counter,d2,pi) { return s2bprimes; }  continue ; } ,
+          _ => { let h = hard(b,interval,y,interval_boundaries,count,counter,d2) ;
+                 if (interval > 0 || counter[1] > 0) && h.0 { return s2bprimes;} else {s2bprimes += h.1 ;} continue ; } ,
+}
+      }             
       }
      } 
 
@@ -244,12 +245,12 @@ block.clear();
     } 
 }
  #[inline]
- pub fn p2(interval : usize, p2primes :  &mut usize, u : &mut usize, v :  &mut usize, n : usize, w : &mut usize,
-   block : &mut BitVec , p : &[usize], m : u64 , interval_boundaries : &[usize], phi2 : &mut i64, counter : &[i32], a : usize  )
+ pub fn p2(interval : usize, u : &mut usize, v :  &mut usize, n : usize, w : &mut usize,
+   block : &mut BitVec , p : &[usize], m : u64 , interval_boundaries : &[usize], phi2 : &mut i64, counter : &[i32], a : usize  ) -> u32
       { 
-  *p2primes = 0;
+  let mut p2primes = 0;
 loop { 
-    if *u <= n { *phi2 -= (*v as i64 * (*v - 1) as i64) >> 1 ; return;}
+    if *u <= n { *phi2 -= (*v as i64 * (*v - 1) as i64) >> 1 ; return p2primes;}
    	if *u  < *w  {
    		*w = cmp::max(2,*u -n); 
    		sieve2(*w,*u+1,p,block) ;
@@ -257,9 +258,9 @@ loop {
 	let index = *u-*w+1;
     if !block[index] {
     let y  = (m / (*u as u64)) as usize;
-    if y +1 >= interval_boundaries[interval + 1] { return ; }  
+    if y +1 >= interval_boundaries[interval + 1] { return p2primes; }  
     *phi2 += (cnt_query((y + 1 - interval_boundaries[interval]), counter) as usize + a) as i64 - 1;
-    *p2primes += 1; 
+    p2primes += 1; 
     *v += 1;
     }
     *u -= 2; 

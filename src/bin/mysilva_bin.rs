@@ -76,8 +76,8 @@ let mut u = match exponent % 2 {
 if u % 2 == 0 { u -= 1;}
 let mut v = a;
 let mut w = u + 1;
-let mut p2primes = 0 ;
-let mut s2bprimes = 0 ;
+//let mut p2primes = 0 ;
+//let mut s2bprimes = 0 ;
 let mut endofprimes : usize = a-2 ;
 ordinary_leaves(n,&mut count,&mu,m);
 for index in 0..(SUBSTITUTE+1) {
@@ -85,7 +85,7 @@ for index in 0..(SUBSTITUTE+1) {
   }  ;
 for index in astar..(a - 1) {
     special_leaves_type_2_initialize(index,primes[index + 1],m,&mut t,n,&pi,a,&mut d2,&mut count) ;
-    special_leaves_type_2(index,0,&mut s2bprimes,&mut d2,m,&primes,&mut tt,n,&mut switch,&interval_boundaries,&mut count,&initial,&pi);
+    special_leaves_type_2(index,0,&mut d2,m,&primes,&mut tt,n,&mut switch,&interval_boundaries,&mut count,&initial,&pi);
   }
 	initial.iter_mut().into_rc().enumerate().foreach( |(i,e)| {*e = (i as i32 +1) & !(i as i32) } ) ;
 // start of main loop
@@ -98,11 +98,11 @@ if index > SUBSTITUTE && index < astar {
 	phi[index] += (counter[interval_length - 1] & !SIGNBIT) as u64 ; } 
 if index >= astar && index <= endofprimes {
      if switch[index] {
- 		special_leaves_type_2(index,interval,&mut s2bprimes,&mut d2,m,&primes,&mut tt,n,&mut switch,&interval_boundaries,&mut count,&counter,&pi);
+ 	let	s2bprimes = special_leaves_type_2(index,interval,&mut d2,m,&primes,&mut tt,n,&mut switch,&interval_boundaries,&mut count,&counter,&pi);
  		count += (s2bprimes as u64 * phi[index]) as i64 ;
  		phi[index] += (counter[interval_length - 1] & !SIGNBIT) as u64;      }
      else  { endofprimes=index; return ;    } } } ) ;
-p2(interval,&mut p2primes,&mut u,&mut v,n,&mut w,&mut block,&primes,m,&interval_boundaries,&mut phi2,&counter,a)  ;
+let p2primes = p2(interval,&mut u,&mut v,n,&mut w,&mut block,&primes,m,&interval_boundaries,&mut phi2,&counter,a)  ;
 phi2 += phi[a] as i64 * p2primes as i64;
 phi[a] += (counter[interval_length - 1] & !SIGNBIT) as u64; } );
 //end of main loop
