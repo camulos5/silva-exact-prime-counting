@@ -26,7 +26,7 @@ pub fn cnt_query(mut pos : usize, counter : &[i32]) -> u32 {
 	pos += 1 ;
 	pos &= pos - 1 ;
 	while pos  != 0 {	
-		acc+=counter[pos - 1] & !SIGNBIT;
+		acc += counter[pos - 1] & !SIGNBIT;
 		pos &= pos - 1;
 	}
 acc as u32
@@ -44,7 +44,7 @@ pub fn cnt_update(mut pos : usize, counter : &mut[i32], interval_length : usize 
 
 #[inline]
 pub fn interval_clear(index : usize , offsets : &mut[usize],  counter : &mut[i32], interval_length : usize, prime : usize) {
-//   (offsets[index]..interval_length).step(prime).foreach(|j| {    	if counter[j] > 0 { cnt_update( j, counter, interval_length ) ; } }) ;
+//   (offsets[index]..interval_length).step(prime).foreach(|j| {    	if counter[j] > 0 { cnt_update( j, counter, interval_length ) ; } }) ; much slower
   
    let mut j  = offsets[index] ;
    while j < interval_length {
@@ -89,18 +89,27 @@ pi[i as usize]=pix;
  pix
  } 
  
+/* 
  pub fn ordinary_leaves(n : usize, count : &mut i64, mu : &[isize], m : u64) {
   for i in (1..n + 1).step(2) {
-  	let term1 = (mu[(i+1) >> 1]).signum() as i64;
-  	*count +=  term1 * (m as i64/ i as i64) ;
+  	let term = (mu[(i+1) >> 1]).signum() as i64;
+  	*count +=  term * (m as i64/ i as i64) ;
  }
 for i in (2..n + 1).step(4) {
-	let term2 = (mu[((i >> 1)  + 1) >> 1]).signum() as i64 ;
-		*count -= term2 * (m as i64 / i as i64) ;
+	let term = (mu[((i >> 1)  + 1) >> 1]).signum() as i64 ;
+	*count -= term * (m as i64 / i as i64) ;
 }
 }       
+ */
+  pub fn ordinary_leaves(n : usize, count : &mut i64, mu : &[isize], m : u64) {
+let mut it = (1..n+1).filter(|&i| i%4 != 0) ;
+it.foreach(|i| {if i % 2 == 1 
+		{let term = (mu[(i+1) >> 1]).signum() as i64;
+  	*count +=  term * (m as i64/ i as i64) ;}
+		 else { let term = (mu[((i >> 1)  + 1) >> 1]).signum() as i64 ;
+	*count -= term * (m as i64 / i as i64) ;} })
+}
  
-
 
  pub fn rphi(term: i64,  mut a : usize, bit : i8 , primes: &[usize],  total : &mut i64 )  {
 	loop {
