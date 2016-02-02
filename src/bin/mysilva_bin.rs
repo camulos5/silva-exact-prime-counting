@@ -64,30 +64,26 @@ let mut d2 : Vec<usize> = vec![0;a-1];
 let mut offsets : Vec<usize> = vec![0;a + 1];
 let mut block : BitVec = BitVec::from_elem(n+3,false);
 let mut switch : Vec<bool> = vec![false;a + 1];
-let mut  count : i64 = a as i64 - 1;
-let intervals = (0..num_intervals).collect_vec() ;
 (1..num_intervals).foreach(|i| { interval_boundaries[i] = 1 + (i * interval_length); }) ;
 interval_boundaries[num_intervals] = z;
 let mut  phi2 = (a as i64* (a as i64 - 1)) >> 1;
 let mut u = match exponent % 2 {
  0 =>  10usize.pow(exponent/2) - 1,
- _  => 10.0_f64.powf(exponent as f64 / 2.0).floor() as usize,
- }; //int_sqrt(m as usize);
+ _  => 10.0_f64.powf(exponent as f64 / 2.0).floor() as usize,}; //int_sqrt(m as usize);
 if u % 2 == 0 { u -= 1;}
 let mut v = a;
 let mut w = u + 1;
 let mut endofprimes = a -2 ;
-ordinary_leaves(n,&mut count,&mu,m);
-for index in 0..(SUBSTITUTE+1) {
- 	count -= special_leaves_type_1_substitute(index,&primes,n,&mu,m) ; 
-  }  ;
-for index in astar..(a - 1) {
+let mut  count : i64 = a as i64 - 1;
+count += ordinary_leaves(n,&mu,m);
+(0..SUBSTITUTE+1).foreach(|index| 
+ 	count -= special_leaves_type_1_substitute(index,&primes,n,&mu,m) )    ;
+(astar..a - 1).foreach(|index| {
     special_leaves_type_2_initialize(index,primes[index + 1],m,&mut t,n,&pi,a,&mut d2,&mut count) ;
-    special_leaves_type_2(index,0,&mut d2,m,&primes,&mut tt,n,&mut switch,&interval_boundaries,&mut count,&initial,&pi);
-  }
-	initial.iter_mut().into_rc().enumerate().foreach( |(i,e)| {*e = (i as i32 +1) & !(i as i32) } ) ;
+    special_leaves_type_2(index,0,&mut d2,m,&primes,&mut tt,n,&mut switch,&interval_boundaries,&mut count,&initial,&pi); } ) ;
+initial.iter_mut().into_rc().enumerate().foreach( |(i,e)| {*e = (i as i32 +1) & !(i as i32) } ) ;
 // start of main loop
-intervals.iter().foreach( |&interval| {
+(0..num_intervals).foreach( |interval| {
 let mut	 counter = &mut initial.clone() ;
 (1..a + 1).foreach( |index| {
   interval_clear(index,&mut offsets,&mut counter,interval_length,primes[index]) ;

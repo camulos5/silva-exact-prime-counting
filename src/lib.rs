@@ -101,13 +101,15 @@ for i in (2..n + 1).step(4) {
 }
 }       
  */
-  pub fn ordinary_leaves(n : usize, count : &mut i64, mu : &[isize], m : u64) {
-let mut it = (1..n+1).filter(|&i| i%4 != 0) ;
+  pub fn ordinary_leaves(n : usize, mu : &[isize], m : u64) -> i64 {
+let mut result = 0 ;
+let mut it = (1..n+1).filter(|&i| i % 4 != 0) ;
 it.foreach(|i| {if i % 2 == 1 
 		{let term = (mu[(i+1) >> 1]).signum() as i64;
-  	*count +=  term * (m as i64 / i as i64) ;}
+  	result +=  term * (m as i64 / i as i64) ;}
 		 else { let term = (mu[((i >> 1)  + 1) >> 1]).signum() as i64 ;
-	*count -= term * (m as i64 / i as i64) ;} })
+	result -= term * (m as i64 / i as i64) ;} }) ;
+result
 }
  
 
