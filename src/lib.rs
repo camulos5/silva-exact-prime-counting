@@ -89,19 +89,7 @@ pi[i as usize]=pix;
  pix
  } 
  
-/* 
- pub fn ordinary_leaves(n : usize, count : &mut i64, mu : &[isize], m : u64) {
-  for i in (1..n + 1).step(2) {
-  	let term = (mu[(i+1) >> 1]).signum() as i64;
-  	*count +=  term * (m as i64/ i as i64) ;
- }
-for i in (2..n + 1).step(4) {
-	let term = (mu[((i >> 1)  + 1) >> 1]).signum() as i64 ;
-	*count -= term * (m as i64 / i as i64) ;
-}
-}       
- */
-  pub fn ordinary_leaves(n : usize, mu : &[isize], m : u64) -> i64 {
+pub fn ordinary_leaves(n : usize, mu : &[isize], m : u64) -> i64 {
 let mut result = 0 ;
 let mut it = (1..n+1).filter(|&i| i % 4 != 0) ;
 it.foreach(|i| {if i % 2 == 1 
@@ -174,11 +162,11 @@ d2[b] = t[b] - 1 ;
 *count += (a - d2[b]) as i64 ;
 }
 #[inline]
-pub fn hard(b :  usize , interval : usize, y : usize, interval_boundaries : &[usize], count : &mut i64, counter : &[i32], d2 : &mut [usize]) -> ( bool, u32) {
-    if y + 1 >= interval_boundaries[interval+1] {return (true,0); }
+pub fn hard(b :  usize , interval : usize, y : usize, interval_boundaries : &[usize], count : &mut i64, counter : &[i32], d2 : &mut [usize]) -> bool {
+    if y + 1 >= interval_boundaries[interval+1] {return true ; }
     *count+= cnt_query((y + 1 - interval_boundaries[interval]),counter) as i64;
     d2[b] -= 1;
-   ( false, 1 )
+   false
     }
    
  #[inline]  
@@ -230,10 +218,9 @@ pub fn easy_clustered(b :  usize , interval : usize, y : usize, n : usize, tt: &
       {
        let y = (m / (p[b + 1] as u64 * p[d2[b]] as u64)) as usize;
        match tt[b] {
-          0 => { if easy_clustered(b, interval,y,n,tt,switch,interval_boundaries,count,counter,d2,m,pi,p) { return s2bprimes;} continue ; } ,
+          0 => { if easy_clustered(b, interval, y, n, tt, switch, interval_boundaries, count, counter, d2, m, pi, p) { return s2bprimes;} continue ; } ,
           1 => { if easy_sparse(b,interval,y,n,tt,switch,interval_boundaries,count,counter,d2,pi) { return s2bprimes; }  continue ; } ,
-          _ => { let h = hard(b,interval,y,interval_boundaries,count,counter,d2) ;
-                 if (interval > 0 || counter[1] > 0) && h.0 { return s2bprimes;} s2bprimes += h.1 ; continue ; } ,
+          _ => { if (interval > 0 || counter[1] > 0) &&  hard(b,interval,y,interval_boundaries,count,counter,d2)  { return s2bprimes;} s2bprimes += 1 ; continue ; } ,
 }
       }             
       }
@@ -245,9 +232,9 @@ pub fn easy_clustered(b :  usize , interval : usize, y : usize, n : usize, tt: &
 block.clear();
    let mut i  = 1 ; 
     while p[i] * p[i] <= y {
-    let mut offset = modneg(1-x as i64,p[i]);
-//    (offset..2+y-x).step(p[i]).foreach(|j| block.set(j,true) ) ; much slower
-       while offset <= 1+(y-x)  { 
+    let  mut offset = modneg(1 - x as i64, p[i]);
+//    (offset..2+y-x).step(p[i]).foreach(|j| block.set(j,true) ) ;// more than twice the time - map/collect makes no difference
+       while offset <= 1 + (y - x)  { 
     	 block.set(offset,true);
          offset += p[i];
         }
