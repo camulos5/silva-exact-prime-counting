@@ -96,8 +96,8 @@ phi2 += phi[index] as i64 * p2primes as i64; }
 phi[index] += (counter[interval_length - 1] & !SIGNBIT) as u64; } ) ;  } );
 //end of main loop
 println!("prime count for 10 ^ {} = {} ",exponent,count - phi2) ; 
-let end: DateTime<Local> = Local::now();
-println!("{} seconds {} milliseconds",(end-start).num_milliseconds()/1000, (end-start).num_milliseconds()-(end-start).num_seconds()*1000) ;
+let end: DateTime<Local> = Local::now(); let elapsed = end-start ;
+println!("{} minutes {} seconds {} milliseconds",elapsed.num_minutes(),elapsed.num_seconds()-elapsed.num_minutes()*60, elapsed.num_milliseconds()-elapsed.num_seconds()*1000) ;
 continue 'foo ;
 }     
 }
