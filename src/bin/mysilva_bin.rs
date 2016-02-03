@@ -73,8 +73,7 @@ let mut u = match exponent % 2 {
 if u % 2 == 0 { u -= 1;}
 let mut v = a;
 let mut w = u + 1;
-let mut endofprimes = a -2 ;
-let mut  count : i64 = a as i64 - 1;
+let mut  count = a as i64 - 1;
 count += ordinary_leaves(n,&mu,m);
 (0..SUBSTITUTE+1).foreach(|index| 
  	count -= special_leaves_type_1_substitute(index,&primes,n,&mu,m) )    ;
@@ -83,16 +82,14 @@ count += ordinary_leaves(n,&mu,m);
     special_leaves_type_2(index,0,&mut d2,m,&primes,&mut tt,n,&mut switch,&interval_boundaries,&mut count,&initial,&pi); } ) ;
 initial.iter_mut().into_rc().enumerate().foreach( |(i,e)| {*e = (i as i32 +1) & !(i as i32) } ) ;
 // start of main loop
-(0..num_intervals).foreach( |interval| {
+(0..num_intervals).inspect( |&interval| {
 let mut	 counter = &mut initial.clone() ;
 (1..a + 1).foreach( |index| {   interval_clear(index,&mut offsets,&mut counter,interval_length,primes[index]) ;
-if index < astar && index > SUBSTITUTE {
-	special_leaves_type_1(index,interval,&mut m1,n,primes[index + 1],m,&interval_boundaries,&mu,&mut count,&phi,&counter) ; } 
-if index >= astar && index <   endofprimes // a - 1 
-{     if switch[index] {
- 	let	s2bprimes = special_leaves_type_2(index,interval,&mut d2,m,&primes,&mut tt,n,&mut switch,&interval_boundaries,&mut count,&counter,&pi);
- 		count += (s2bprimes as u64 * phi[index]) as i64 ;   }
-     else  { endofprimes=index; return ;    }  }
+if index < astar && index > SUBSTITUTE { special_leaves_type_1(index,interval,&mut m1,n,primes[index + 1],m,&interval_boundaries,&mu,&mut count,&phi,&counter) ; } 
+if index >= astar  && switch[index] 
+{  	let	s2bprimes = special_leaves_type_2(index,interval,&mut d2,m,&primes,&mut tt,n,&mut switch,&interval_boundaries,&mut count,&counter,&pi);
+ 		count += (s2bprimes as u64 * phi[index]) as i64 ;    }
+if !switch[index] && index >=astar && index < a-1 { return;}
 if index == a { 
 	let p2primes = p2(interval,&mut u,&mut v,n,&mut w,&mut block,&primes,m,&interval_boundaries,&mut phi2,&counter,a)  ;
 phi2 += phi[index] as i64 * p2primes as i64; }
