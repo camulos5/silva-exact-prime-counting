@@ -251,17 +251,13 @@ loop {
     if *u <= n { *phi2 -= (*v as i64 * (*v - 1) as i64) >> 1 ; return p2primes;}
    	if *u  < *w  {
    		*w = cmp::max(2,*u -n); 
-   		sieve2(*w,*u+1,p,block) ;
-   		    } 
-	let index = *u-*w+1;
-    if !block[index] {
+   		sieve2(*w,*u+1,p,block) ; } 
+    if !block[*u - *w + 1] {
     let y  = (m / (*u as u64)) as usize;
     if y +1 >= interval_boundaries[interval + 1] { return p2primes; }  
     *phi2 += (cnt_query((y + 1 - interval_boundaries[interval]), counter) as usize + a) as i64 - 1;
     p2primes += 1; 
-    *v += 1;
-    }
-    *u -= 2; 
-}  
+    *v += 1; }
+    *u -= 2; }  
 } 
 
