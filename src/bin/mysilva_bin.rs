@@ -24,7 +24,7 @@ match exponent {
 	_ => {println!("Not a valid input: integer between 1 and 17"); return ;},
 	}
 let start: DateTime<Local> = Local::now();
-println!("{:?}",start) ;
+println!("{:?}",start.format("%a %e %b %T ").to_string()) ;
 let m = 10u64.pow(exponent) ;
 let mut beta = 0.00087 ;
 //    if exponent = 18 then  beta:= 0.0033; also needs posssibly quite extensive re-typing and takes over an hour
@@ -69,7 +69,7 @@ interval_boundaries[num_intervals] = z;
 let mut  phi2 = (a as i64* (a as i64 - 1)) >> 1;
 let mut u = match exponent % 2 {
  0 =>  10usize.pow(exponent/2) - 1,
- _  => 10.0_f64.powf(exponent as f64 / 2.0).floor() as usize,}; //int_sqrt(m as usize);
+ _  => 10.0_f64.powf(exponent as f64 / 2.0).floor() as usize,}; 
 if u % 2 == 0 { u -= 1;}
 let mut v = a;
 let mut w = u + 1;
@@ -85,24 +85,23 @@ initial.iter_mut().into_rc().enumerate().foreach( |(i,e)| {*e = (i as i32 +1) & 
 // start of main loop
 (0..num_intervals).foreach( |interval| {
 let mut	 counter = &mut initial.clone() ;
-(1..a + 1).foreach( |index| {
-  interval_clear(index,&mut offsets,&mut counter,interval_length,primes[index]) ;
-if index > SUBSTITUTE && index < astar {
-	special_leaves_type_1(index,interval,&mut m1,n,primes[index + 1],m,&interval_boundaries,&mu,&mut count,&phi,&counter) ;
-	phi[index] += (counter[interval_length - 1] & !SIGNBIT) as u64 ; } 
-if index >= astar && index <= endofprimes {
-     if switch[index] {
+(1..a + 1).foreach( |index| {   interval_clear(index,&mut offsets,&mut counter,interval_length,primes[index]) ;
+if index < astar && index > SUBSTITUTE {
+	special_leaves_type_1(index,interval,&mut m1,n,primes[index + 1],m,&interval_boundaries,&mu,&mut count,&phi,&counter) ; } 
+if index >= astar && index <   endofprimes // a - 1 
+{     if switch[index] {
  	let	s2bprimes = special_leaves_type_2(index,interval,&mut d2,m,&primes,&mut tt,n,&mut switch,&interval_boundaries,&mut count,&counter,&pi);
- 		count += (s2bprimes as u64 * phi[index]) as i64 ;
- 		phi[index] += (counter[interval_length - 1] & !SIGNBIT) as u64;      }
-     else  { endofprimes=index; return ;    } } } ) ;
-let p2primes = p2(interval,&mut u,&mut v,n,&mut w,&mut block,&primes,m,&interval_boundaries,&mut phi2,&counter,a)  ;
-phi2 += phi[a] as i64 * p2primes as i64;
-phi[a] += (counter[interval_length - 1] & !SIGNBIT) as u64; } );
+ 		count += (s2bprimes as u64 * phi[index]) as i64 ;   }
+     else  { endofprimes=index; return ;    }  }
+if index == a { 
+	let p2primes = p2(interval,&mut u,&mut v,n,&mut w,&mut block,&primes,m,&interval_boundaries,&mut phi2,&counter,a)  ;
+phi2 += phi[index] as i64 * p2primes as i64; }
+phi[index] += (counter[interval_length - 1] & !SIGNBIT) as u64;
+} ) ;  } );
 //end of main loop
 println!("prime count for 10 ^ {} = {} ",exponent,count - phi2) ; 
 let end: DateTime<Local> = Local::now();
-println!("{:?}",end - start) ;
+println!("{} seconds {} milliseconds",(end-start).num_milliseconds()/1000, (end-start).num_milliseconds()-(end-start).num_seconds()*1000) ;
 continue 'foo ;
 }     
 }
