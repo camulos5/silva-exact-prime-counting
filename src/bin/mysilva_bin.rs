@@ -7,6 +7,7 @@ use bit_vec::BitVec ;
 use mysilva::* ;
 use chrono::* ;
 use itertools::Itertools ;
+use std::thread ;
 const SIGNBIT : i32 = 1<<31;
 const SUBSTITUTE : usize = 2 ;
 fn main() {
@@ -75,16 +76,18 @@ count += ordinary_leaves(n,&mu,m);
     special_leaves_type_2(index,0,&mut d2,m,&primes,&mut tt,n,&mut switch,&interval_boundaries,&mut count,&initial,&pi); } ) ;
 initial.iter_mut().into_rc().enumerate().foreach( |(i,e)| {*e = (i as i32 +1) & !(i as i32) } ) ;
 // start of main loop
-(0..num_intervals).foreach( |interval| { let mut counter = &mut initial.clone() ;
-(1..a + 1).foreach( |index| {   interval_clear(index,&mut offsets,&mut counter,interval_length,primes[index]) ;
+'bar : for interval in 0..num_intervals { let mut counter = &mut initial.clone() ;
+for index in 1..a+1 {   interval_clear(index,&mut offsets,&mut counter,interval_length,primes[index]) ;
+//		thread::spawn(|index| {
 if index < astar && index > SUBSTITUTE { special_leaves_type_1(index,interval,&mut m1,n,primes[index + 1],m,&interval_boundaries,&mu,&mut count,&phi,&counter) ; } 
+//});
 if index >= astar  && switch[index] 
 {  	let	s2bprimes = special_leaves_type_2(index,interval,&mut d2,m,&primes,&mut tt,n,&mut switch,&interval_boundaries,&mut count,&counter,&pi);
  		count += (s2bprimes as u64 * phi[index]) as i64 ;    }
-if !switch[index] && index < a-1 { return;}
+if !switch[index] && index < a-1 { continue;}
 if index == a { let p2primes = p2(interval,&mut u,&mut v,n,&mut w,&mut block,&primes,m,&interval_boundaries,&mut phi2,&counter,a)  ;
 phi2 += phi[index] as i64 * p2primes as i64; }
-phi[index] += (counter[interval_length - 1] & !SIGNBIT) as u64; } ) ;  } );
+phi[index] += (counter[interval_length - 1] & !SIGNBIT) as u64; }   } ;
 //end of main loop
 println!("prime count for 10 ^ {} = {} ",exponent,count - phi2) ; 
 let end: DateTime<Local> = Local::now(); let elapsed = end-start ;
